@@ -78,6 +78,18 @@ end-to-end pipeline ตั้งแต่ดึงข้อมูลดิบจ
 
 **ไฟล์:** `vector_search.py`, endpoint ใน `api.py`
 
+## Phase 6: Cloud Data Warehouse (Google BigQuery)
+
+โหลดข้อมูลจาก local CSV ขึ้น Google BigQuery เพื่อจำลอง production data warehouse
+ที่ใช้งานจริงในองค์กร:
+
+- ตั้งค่า GCP project และ authentication ผ่าน `gcloud` CLI
+- สร้าง dataset/table บน BigQuery ด้วย `google-cloud-bigquery`
+- รัน SQL query แบบเดียวกับ Phase 4 บน cloud (เทียบผลลัพธ์ได้ตรงกัน
+  ยืนยันความถูกต้องของข้อมูล)
+
+**ไฟล์:** `load_to_bigquery.py`, `bigquery_queries.py`
+
 ## เทคโนโลยีที่ใช้
 
 - **Python 3.14**
@@ -108,8 +120,8 @@ uvicorn api:app --reload
 - [x] Data analysis: เปรียบเทียบราคาเฉลี่ยแต่ละหมวดหมู่ด้วย pandas
 - [x] SQL database: โหลดข้อมูลเข้า SQLite พร้อม complex queries
 - [x] Semantic search: Vector DB (ChromaDB) + RAG-style search endpoint
+- [x] Cloud data warehouse: โหลดข้อมูลเข้า Google BigQuery
 - [ ] เพิ่ม data quality checks (ตรวจสอบ null, ค่าผิดปกติ)
-- [ ] โหลดข้อมูลเข้า cloud data warehouse (BigQuery)
 - [ ] เพิ่ม scheduled scraping (รันอัตโนมัติทุกวัน)
 
 ## หมายเหตุสำคัญ
