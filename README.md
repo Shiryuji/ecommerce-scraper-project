@@ -32,6 +32,7 @@ end-to-end pipeline ตั้งแต่ดึงข้อมูลดิบจ
 | `GET /products` | ดึงสินค้าทั้งหมด |
 | `GET /products/category/{category_name}` | กรองตามหมวดหมู่ (เช่น iPhone, iPad) |
 | `GET /products/under/{max_price}` | กรองสินค้าที่ราคาเริ่มต้นไม่เกินที่กำหนด |
+| `GET /products/search?q={query}` | ค้นหาสินค้าด้วยภาษาธรรมชาติ (semantic search) |
 
 รองรับ error handling (คืน HTTP 404 พร้อมข้อความ เมื่อหาหมวดหมู่ไม่พบ)
 มีเอกสาร API แบบ interactive อัตโนมัติที่ `/docs` (Swagger UI)
@@ -54,12 +55,37 @@ end-to-end pipeline ตั้งแต่ดึงข้อมูลดิบจ
 
 ![Price comparison chart](price_by_category.png)
 
+## Phase 4: SQL Database
+
+โหลดข้อมูลเข้า SQLite และเขียน SQL query ระดับกลาง-สูง เพื่อฝึกและโชว์ทักษะ SQL:
+
+- **Aggregate + GROUP BY** — สรุปสถิติราคาแยกตามหมวดหมู่
+- **Window Function** (`RANK() OVER PARTITION BY`) — จัดอันดับสินค้าแพงสุดในแต่ละหมวด
+  โดยไม่ยุบข้อมูล
+- **Correlated Subquery** — หาสินค้าที่ราคาสูงกว่าค่าเฉลี่ยของหมวดตัวเอง
+
+**ไฟล์:** `load_to_db.py`, `sql_queries.py`
+
+## Phase 5: Semantic Search (Vector DB / RAG)
+
+เพิ่มความสามารถค้นหาสินค้าด้วยภาษาธรรมชาติ โดยใช้ ChromaDB แปลงชื่อ+รายละเอียดสินค้า
+เป็นเวกเตอร์ (embeddings) แล้วค้นหาจาก "ความหมาย" แทนการจับคู่ keyword ตรงๆ
+
+ตัวอย่าง: ค้นหา `"laptop for video editing"` แล้วระบบเข้าใจและแนะนำ MacBook Pro
+สเปคสูง (M5 Pro/Max) ได้ ทั้งที่ในข้อมูลไม่มีคำว่า "video editing" อยู่เลย
+
+เชื่อมเข้ากับ FastAPI เป็น endpoint ใหม่: `GET /products/search?q={คำค้นหา}`
+
+**ไฟล์:** `vector_search.py`, endpoint ใน `api.py`
+
 ## เทคโนโลยีที่ใช้
 
 - **Python 3.14**
 - **requests, BeautifulSoup4** — web scraping
 - **pandas, re** — data cleaning & processing
 - **FastAPI, Uvicorn** — REST API
+- **SQLite** — relational database
+- **ChromaDB** — vector database สำหรับ semantic search
 
 ## วิธีรันโปรเจกต์
 
@@ -80,6 +106,8 @@ uvicorn api:app --reload
 ## แผนพัฒนาต่อ (Roadmap)
 
 - [x] Data analysis: เปรียบเทียบราคาเฉลี่ยแต่ละหมวดหมู่ด้วย pandas
+- [x] SQL database: โหลดข้อมูลเข้า SQLite พร้อม complex queries
+- [x] Semantic search: Vector DB (ChromaDB) + RAG-style search endpoint
 - [ ] เพิ่ม data quality checks (ตรวจสอบ null, ค่าผิดปกติ)
 - [ ] โหลดข้อมูลเข้า cloud data warehouse (BigQuery)
 - [ ] เพิ่ม scheduled scraping (รันอัตโนมัติทุกวัน)
