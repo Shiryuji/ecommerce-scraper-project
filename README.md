@@ -38,6 +38,22 @@ end-to-end pipeline ตั้งแต่ดึงข้อมูลดิบจ
 
 **ไฟล์:** `api.py`
 
+## Phase 3: Data Analysis & Visualization
+
+วิเคราะห์ข้อมูลสินค้าด้วย pandas เพื่อหา insight เชิงธุรกิจ:
+
+- เปรียบเทียบราคาเฉลี่ยแต่ละหมวดหมู่ (`groupby`)
+- หาสินค้าที่แพงที่สุด/ถูกที่สุดในแต่ละหมวด
+- สรุปสถิติราคาทั้งหมด (mean, median, std, quartiles)
+- สร้างกราฟแท่งเปรียบเทียบด้วย matplotlib
+
+**ผลลัพธ์:** MacBook มีราคาเฉลี่ยสูงสุด (~79,200 บาท) สูงกว่า iPad เกือบ 2 เท่า
+และสูงกว่า Apple Watch กว่า 6 เท่า
+
+**ไฟล์:** `analysis.py`, `price_by_category.png`
+
+![Price comparison chart](price_by_category.png)
+
 ## เทคโนโลยีที่ใช้
 
 - **Python 3.14**
@@ -63,7 +79,7 @@ uvicorn api:app --reload
 
 ## แผนพัฒนาต่อ (Roadmap)
 
-- [ ] Data analysis: เปรียบเทียบราคาเฉลี่ยแต่ละหมวดหมู่ด้วย pandas
+- [x] Data analysis: เปรียบเทียบราคาเฉลี่ยแต่ละหมวดหมู่ด้วย pandas
 - [ ] เพิ่ม data quality checks (ตรวจสอบ null, ค่าผิดปกติ)
 - [ ] โหลดข้อมูลเข้า cloud data warehouse (BigQuery)
 - [ ] เพิ่ม scheduled scraping (รันอัตโนมัติทุกวัน)
